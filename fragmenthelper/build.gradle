@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+ext {
+
+    bintrayRepo = "FragmentHelper"
+    bintrayName = "com.techyourchance.fragmenthelper"
+
+    libraryName = 'fragmenthelper'
+
+    publishedGroupId = 'com.techyourchance'
+    artifact = 'fragmenthelper'
+    libraryVersion = '0.7.0'
+
+    libraryDescription = 'Simple library that provides common Fragment related functionality'
+
+    siteUrl = ''
+    gitUrl = ''
+
+    developerId = 'techyourchance'
+    developerName = 'Vasiliy Zukanov'
+    developerEmail = 'techyourchance@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "0.7.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
+}
+
+// Add these lines to publish library to bintray.
+// This is the readymade scripts made by github user nuuneoi to make uploading to bintray easy.
+// Place it at the end of the file
+if (project.rootProject.file('local.properties').exists()) {
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+}
+
