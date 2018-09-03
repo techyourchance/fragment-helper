@@ -15,8 +15,8 @@ ext {
 
     libraryDescription = 'Simple library that provides common Fragment related functionality'
 
-    siteUrl = ''
-    gitUrl = ''
+    siteUrl = 'https://github.com/techyourchance/fragment-helper'
+    gitUrl = 'https://github.com/techyourchance/fragment-helper.git'
 
     developerId = 'techyourchance'
     developerName = 'Vasiliy Zukanov'
