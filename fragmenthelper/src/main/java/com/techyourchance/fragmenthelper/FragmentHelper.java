@@ -3,6 +3,7 @@ package com.techyourchance.fragmenthelper;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,12 +27,30 @@ public class FragmentHelper {
         replaceFragment(newFragment, true, false);
     }
 
-    public void replaceFragmentDontAddToBackstack(@NonNull Fragment newFragment) {
+    public void replaceFragmentAndRemoveCurrentFromHistory(@NonNull Fragment newFragment) {
         replaceFragment(newFragment, false, false);
     }
 
-    public void replaceFragmentAndClearBackstack(@NonNull Fragment newFragment) {
+    public void replaceFragmentAndClearHistory(@NonNull Fragment newFragment) {
         replaceFragment(newFragment, false, true);
+    }
+
+    public void navigateBack() {
+
+        if (mFragmentManager.isStateSaved()) {
+            // BACK NAVIGATION CAN BE SILENTLY ABORTED
+            // since this flow involves popping the backstack, we can't execute it safely after
+            // the state is saved
+            // I asked a question about this: https://stackoverflow.com/q/52165653/2463035
+            return;
+        }
+
+        if (goBackInFragmentsHistory()) {
+            return; // up navigation resulted in going back in fragments history
+        }
+
+        finishActivity();
+
     }
 
     public void navigateUp() {
@@ -44,8 +63,7 @@ public class FragmentHelper {
             return;
         }
 
-        if (getFragmentsHistoryCount() > 0) {
-            goBackInFragmentsHistory();
+        if (goBackInFragmentsHistory()) {
             return; // up navigation resulted in going back in fragments history
         }
 
@@ -64,16 +82,20 @@ public class FragmentHelper {
             return; // up navigation resulted in going to hierarchical parent activity
         }
 
-        mActivity.finish(); // no "up" navigation targets - just finish the activity
+        finishActivity(); // no "up" navigation targets - just finish the activity
     }
 
-    private void goBackInFragmentsHistory() {
-        // A call to popBackStack can leave the currently visible fragment on screen. Therefore,
-        // we start with manual removal of the current fragment.
-        // Description of the issue can be found here: https://stackoverflow.com/q/45278497/2463035
-        removeCurrentFragment();
+    private boolean goBackInFragmentsHistory() {
+        if (getFragmentsHistoryCount() > 0) {
+            // A call to popBackStack can leave the currently visible fragment on screen. Therefore,
+            // we start with manual removal of the current fragment.
+            // Description of the issue can be found here: https://stackoverflow.com/q/45278497/2463035
+            removeCurrentFragment();
 
-        mFragmentManager.popBackStackImmediate();
+            mFragmentManager.popBackStackImmediate();
+            return true;
+        }
+        return false;
     }
 
     private void replaceFragment(@NonNull Fragment newFragment,
@@ -132,6 +154,10 @@ public class FragmentHelper {
 
     private int getFragmentFrameId() {
         return mFragmentContainerWrapper.getFragmentContainer().getId();
+    }
+
+    private void finishActivity() {
+        ActivityCompat.finishAfterTransition(mActivity);
     }
 
 }

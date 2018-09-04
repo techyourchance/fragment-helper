@@ -20,12 +20,17 @@ public class SampleActivity extends AppCompatActivity implements FragmentContain
 
         if (savedInstanceState == null) {
             // don't add the empty state of this activity to backstack
-            mFragmentHelper.replaceFragmentDontAddToBackstack(SampleFragment.newInstance(1));
+            mFragmentHelper.replaceFragmentAndRemoveCurrentFromHistory(SampleFragment.newInstance(1));
         }
     }
 
     @Override
     public ViewGroup getFragmentContainer() {
         return findViewById(R.id.frame_content);
+    }
+
+    @Override
+    public void onBackPressed() {
+        mFragmentHelper.navigateBack();
     }
 }

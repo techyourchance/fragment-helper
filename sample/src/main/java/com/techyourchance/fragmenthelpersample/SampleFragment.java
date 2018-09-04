@@ -64,7 +64,7 @@ public class SampleFragment extends Fragment {
         if (shouldAddToBackstack()) {
             mFragmentHelper.replaceFragment(nextFragment);
         } else {
-            mFragmentHelper.replaceFragmentDontAddToBackstack(nextFragment);
+            mFragmentHelper.replaceFragmentAndRemoveCurrentFromHistory(nextFragment);
         }
     }
 
