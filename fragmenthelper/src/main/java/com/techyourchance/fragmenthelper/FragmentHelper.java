@@ -36,45 +36,44 @@ public class FragmentHelper {
 
     public void navigateUp() {
 
-        // Some navigateUp calls can be "lost" if they happen after the state has been saved
         if (mFragmentManager.isStateSaved()) {
+            // UP NAVIGATION CAN BE SILENTLY ABORTED
+            // since this flow involves popping the backstack, we can't execute it safely after
+            // the state is saved
+            // I asked a question about this: https://stackoverflow.com/q/52165653/2463035
             return;
         }
 
-        Fragment currentFragment = getCurrentFragment();
-
-        if (mFragmentManager.getBackStackEntryCount() > 0) {
-
-            // In a normal world, just popping back stack would be sufficient, but since android
-            // is not normal, a call to popBackStack can leave the popped fragment on screen.
-            // Therefore, we start with manual removal of the current fragment.
-            // Description of the issue can be found here: https://stackoverflow.com/q/45278497/2463035
-            removeCurrentFragment();
-
-            if (mFragmentManager.popBackStackImmediate()) {
-                return; // navigated "up" in fragments back-stack
-            }
+        if (getFragmentsHistoryCount() > 0) {
+            goBackInFragmentsHistory();
+            return; // up navigation resulted in going back in fragments history
         }
+
+        Fragment currentFragment = getCurrentFragment();
 
         if (HierarchicalFragment.class.isInstance(currentFragment)) {
             Fragment parentFragment =
                     ((HierarchicalFragment)currentFragment).getHierarchicalParentFragment();
             if (parentFragment != null) {
                 replaceFragment(parentFragment, false, true);
-                return; // navigate "up" to hierarchical parent fragment
+                return; // up navigation resulted in going to hierarchical parent fragment
             }
         }
 
         if (mActivity.onNavigateUp()) {
-            return; // navigated "up" to hierarchical parent activity
+            return; // up navigation resulted in going to hierarchical parent activity
         }
 
-        mActivity.onBackPressed(); // no "up" navigation targets - just treat UP as back press
+        mActivity.finish(); // no "up" navigation targets - just finish the activity
     }
 
+    private void goBackInFragmentsHistory() {
+        // A call to popBackStack can leave the currently visible fragment on screen. Therefore,
+        // we start with manual removal of the current fragment.
+        // Description of the issue can be found here: https://stackoverflow.com/q/45278497/2463035
+        removeCurrentFragment();
 
-    private @Nullable Fragment getCurrentFragment() {
-        return mFragmentManager.findFragmentById(getFragmentFrameId());
+        mFragmentManager.popBackStackImmediate();
     }
 
     private void replaceFragment(@NonNull Fragment newFragment,
@@ -97,8 +96,22 @@ public class FragmentHelper {
         }
 
         // Change to a new fragment
-        ft.replace(getFragmentFrameId(), newFragment, null);
+        ft.replace(getFragmentFrameId(), newFragment);
 
+        commitFragmentTransactionSafely(ft);
+    }
+
+    private void removeCurrentFragment() {
+        FragmentTransaction ft = mFragmentManager.beginTransaction();
+        ft.remove(getCurrentFragment());
+        commitFragmentTransactionSafely(ft);
+
+        // not sure it is needed; will keep it as a reminder to myself if there will be problems
+        // mFragmentManager.executePendingTransactions();
+    }
+
+    private void commitFragmentTransactionSafely(FragmentTransaction ft) {
+        // TODO: add mechanism for notifications about commits that allow state loss
         if (mFragmentManager.isStateSaved()) {
             // We acknowledge the possibility of losing this transaction if the app undergoes
             // save&restore flow after it is committed.
@@ -108,13 +121,13 @@ public class FragmentHelper {
         }
     }
 
-    private void removeCurrentFragment() {
-        FragmentTransaction ft = mFragmentManager.beginTransaction();
-        ft.remove(getCurrentFragment());
-        ft.commit();
+    private int getFragmentsHistoryCount() {
+        // TODO: double check that fragments history count equals to backstack entry count
+        return mFragmentManager.getBackStackEntryCount();
+    }
 
-        // not sure it is needed; will keep it as a reminder to myself if there will be problems
-        // mFragmentManager.executePendingTransactions();
+    private @Nullable Fragment getCurrentFragment() {
+        return mFragmentManager.findFragmentById(getFragmentFrameId());
     }
 
     private int getFragmentFrameId() {
