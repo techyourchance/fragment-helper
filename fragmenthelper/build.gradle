@@ -11,7 +11,7 @@ ext {
 
     publishedGroupId = 'com.techyourchance'
     artifact = 'fragmenthelper'
-    libraryVersion = '0.7.0'
+    libraryVersion = '0.7.1'
 
     libraryDescription = 'Simple library that provides common Fragment related functionality'
 
@@ -34,8 +34,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 1
-        versionName "0.7.0"
+        versionCode 2
+        versionName "0.7.1"
     }
     buildTypes {
         release {
