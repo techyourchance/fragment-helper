@@ -1,8 +1,9 @@
 package com.techyourchance.fragmenthelper;
 
+import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 public interface FragmentContainerWrapper {
 
-    ViewGroup getFragmentContainer();
+    @NonNull ViewGroup getFragmentContainer();
 }

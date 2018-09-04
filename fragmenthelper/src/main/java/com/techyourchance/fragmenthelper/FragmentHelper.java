@@ -1,6 +1,8 @@
 package com.techyourchance.fragmenthelper;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,21 +14,23 @@ public class FragmentHelper {
     private final FragmentContainerWrapper mFragmentContainerWrapper;
     private final FragmentManager mFragmentManager;
 
-    public FragmentHelper(Activity activity, FragmentContainerWrapper fragmentContainerWrapper, FragmentManager fragmentManager) {
+    public FragmentHelper(@NonNull Activity activity,
+                          @NonNull FragmentContainerWrapper fragmentContainerWrapper,
+                          @NonNull FragmentManager fragmentManager) {
         mActivity = activity;
         mFragmentContainerWrapper = fragmentContainerWrapper;
         mFragmentManager = fragmentManager;
     }
 
-    public void replaceFragment(Fragment newFragment) {
+    public void replaceFragment(@NonNull Fragment newFragment) {
         replaceFragment(newFragment, true, false);
     }
 
-    public void replaceFragmentDontAddToBackstack(Fragment newFragment) {
+    public void replaceFragmentDontAddToBackstack(@NonNull Fragment newFragment) {
         replaceFragment(newFragment, false, false);
     }
 
-    public void replaceFragmentAndClearBackstack(Fragment newFragment) {
+    public void replaceFragmentAndClearBackstack(@NonNull Fragment newFragment) {
         replaceFragment(newFragment, false, true);
     }
 
@@ -68,11 +72,14 @@ public class FragmentHelper {
         mActivity.onBackPressed(); // no "up" navigation targets - just treat UP as back press
     }
 
-    private Fragment getCurrentFragment() {
+
+    private @Nullable Fragment getCurrentFragment() {
         return mFragmentManager.findFragmentById(getFragmentFrameId());
     }
 
-    private void replaceFragment(Fragment newFragment, boolean addToBackStack, boolean clearBackStack) {
+    private void replaceFragment(@NonNull Fragment newFragment,
+                                 boolean addToBackStack,
+                                 boolean clearBackStack) {
         if (clearBackStack) {
             if (mFragmentManager.isStateSaved()) {
                 // If the state is saved we can't clear the back stack. Simply not doing this, but
