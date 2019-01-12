@@ -101,17 +101,34 @@ public class FragmentHelper {
     private void replaceFragment(@NonNull Fragment newFragment,
                                  boolean addToBackStack,
                                  boolean clearBackStack) {
+
+        FragmentTransaction ft = mFragmentManager.beginTransaction();
+
         if (clearBackStack) {
             if (mFragmentManager.isStateSaved()) {
                 // If the state is saved we can't clear the back stack. Simply not doing this, but
                 // still replacing fragment is a bad idea. Therefore we abort the entire operation.
                 return;
             }
-            // Remove all entries from back stack
-            mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
 
-        FragmentTransaction ft = mFragmentManager.beginTransaction();
+            /*
+              Due to the way backstack works, either just clearing backstack or removing fragments
+              won't work reliably:
+              Just pop backstack -> existing fragment on the backstack can become visible during transition
+              Just remove fragments -> screws up default back button behavior
+              Therefore, we need to do both.
+              Remove all entries from back stack
+            */
+
+            if (mFragmentManager.getBackStackEntryCount() > 0) {
+                mFragmentManager.popBackStack(mFragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+
+            // Remove all fragments
+            for (Fragment fragment : mFragmentManager.getFragments()) {
+                ft.remove(fragment);
+            }
+        }
 
         if (addToBackStack) {
             ft.addToBackStack(null);
