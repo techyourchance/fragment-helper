@@ -23,16 +23,16 @@ public class FragmentHelper {
         mFragmentManager = fragmentManager;
     }
 
-    public void replaceFragment(@NonNull Fragment newFragment) {
-        replaceFragment(newFragment, true, false);
+    public void replaceFragment(@NonNull Fragment newFragment, @Nullable FragmentAnimation animation) {
+        replaceFragment(newFragment, true, false, animation);
     }
 
-    public void replaceFragmentAndRemoveCurrentFromHistory(@NonNull Fragment newFragment) {
-        replaceFragment(newFragment, false, false);
+    public void replaceFragmentAndRemoveCurrentFromHistory(@NonNull Fragment newFragment, @Nullable FragmentAnimation animation) {
+        replaceFragment(newFragment, false, false, animation);
     }
 
-    public void replaceFragmentAndClearHistory(@NonNull Fragment newFragment) {
-        replaceFragment(newFragment, false, true);
+    public void replaceFragmentAndClearHistory(@NonNull Fragment newFragment, @Nullable FragmentAnimation animation) {
+        replaceFragment(newFragment, false, true, animation);
     }
 
     public void navigateBack() {
@@ -73,7 +73,7 @@ public class FragmentHelper {
             Fragment parentFragment =
                     ((HierarchicalFragment)currentFragment).getHierarchicalParentFragment();
             if (parentFragment != null) {
-                replaceFragment(parentFragment, false, true);
+                replaceFragment(parentFragment, false, true, null);
                 return; // up navigation resulted in going to hierarchical parent fragment
             }
         }
@@ -100,7 +100,8 @@ public class FragmentHelper {
 
     private void replaceFragment(@NonNull Fragment newFragment,
                                  boolean addToBackStack,
-                                 boolean clearBackStack) {
+                                 boolean clearBackStack,
+                                 @Nullable FragmentAnimation animation) {
 
         FragmentTransaction ft = mFragmentManager.beginTransaction();
 
@@ -117,9 +118,9 @@ public class FragmentHelper {
               Just pop backstack -> existing fragment on the backstack can become visible during transition
               Just remove fragments -> screws up default back button behavior
               Therefore, we need to do both.
-              Remove all entries from back stack
             */
 
+            // Remove all entries from back stack
             if (mFragmentManager.getBackStackEntryCount() > 0) {
                 mFragmentManager.popBackStack(mFragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
             }
@@ -128,6 +129,15 @@ public class FragmentHelper {
             for (Fragment fragment : mFragmentManager.getFragments()) {
                 ft.remove(fragment);
             }
+        }
+
+        if (animation != null) {
+            ft.setCustomAnimations(
+                    animation.getEnterAnimation(),
+                    animation.getExitAnimation(),
+                    animation.getPopEnterAnimation(),
+                    animation.getPopExitAnimation()
+            );
         }
 
         if (addToBackStack) {

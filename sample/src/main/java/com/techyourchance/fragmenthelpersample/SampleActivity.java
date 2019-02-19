@@ -31,7 +31,7 @@ public class SampleActivity extends AppCompatActivity implements FragmentContain
 
         if (savedInstanceState == null) {
             // don't add the empty state of this activity to backstack
-            mFragmentHelper.replaceFragmentAndRemoveCurrentFromHistory(SampleFragment.newInstance(1));
+            mFragmentHelper.replaceFragmentAndRemoveCurrentFromHistory(SampleFragment.newInstance(1), null);
         }
     }
 
