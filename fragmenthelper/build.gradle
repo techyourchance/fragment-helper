@@ -2,6 +2,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
+// Reminder: to upload a new version, do the following:
+// 1. Make sure that everything works (incl. manual checks using sample app)
+// 2. Update library version identifiers (libraryVersion, versionName, versionCode)
+// 3. Run "install" gradle task in fragmenthelper module (under "other")
+// 4. Run "bintrayUpload" gradle task in fragmenthelper module (under "publishing")
+
 ext {
 
     bintrayRepo = "FragmentHelper"
@@ -11,7 +17,7 @@ ext {
 
     publishedGroupId = 'com.techyourchance'
     artifact = 'fragmenthelper'
-    libraryVersion = '0.7.2'
+    libraryVersion = '0.7.3'
 
     libraryDescription = 'Simple library that provides common Fragment related functionality'
 
@@ -33,9 +39,9 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 3
-        versionName "0.7.2"
+        targetSdkVersion 28
+        versionCode 4
+        versionName "0.7.3"
     }
     buildTypes {
         release {
@@ -48,7 +54,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.supportLibVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"

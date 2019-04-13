@@ -25,9 +25,9 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 27
-    buildToolsVersion = "27.0.3"
-    supportLibVersion = "27.1.1"
+    compileSdkVersion = 28
+    buildToolsVersion = "28.0.3"
+    supportLibVersion = '1.0.0-beta01'
     junitVersion = "4.12"
     mockitoVersion = "2.18.3"
 }
